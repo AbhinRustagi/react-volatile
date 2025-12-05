@@ -1,2 +1,4 @@
 export { Randomizer } from "./engine/Randomizer";
+export { Logger } from "./engine/Logger";
+export { Scheduler } from "./engine/Scheduler";
 export type * from "./types";
