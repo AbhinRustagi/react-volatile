@@ -5,3 +5,4 @@ export {
   useVolatileEffect,
   useVolatileLayoutEffect,
 } from "./hooks/useVolatileEffect";
+export { useVolatileReducer } from "./hooks/useVolatileReducer";
