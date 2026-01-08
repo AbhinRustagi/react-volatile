@@ -8,3 +8,4 @@ export {
 export { useVolatileReducer } from "./hooks/useVolatileReducer";
 export { useVolatileMemo } from "./hooks/useVolatileMemo";
 export { useVolatileCallback } from "./hooks/useVolatileCallback";
+export { useVolatileAsync } from "./hooks/useVolatileAsync";
