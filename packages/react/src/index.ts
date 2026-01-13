@@ -10,3 +10,4 @@ export { useVolatileMemo } from "./hooks/useVolatileMemo";
 export { useVolatileCallback } from "./hooks/useVolatileCallback";
 export { useVolatileAsync } from "./hooks/useVolatileAsync";
 export { useChaosTrigger } from "./hooks/useChaosTrigger";
+export { withVolatile } from "./hoc/withVolatile";
