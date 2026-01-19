@@ -1,0 +1,30 @@
+{
+  "name": "@react-volatile/babel-plugin",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@babel/core": "^7.26.0"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.26.0",
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.8"
+  }
+}
