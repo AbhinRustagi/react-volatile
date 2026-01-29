@@ -12,3 +12,4 @@ export { useVolatileAsync } from "./hooks/useVolatileAsync";
 export { useChaosTrigger } from "./hooks/useChaosTrigger";
 export { withVolatile } from "./hoc/withVolatile";
 export { ChaosPanel } from "./components/ChaosPanel";
+export { ChaosIndicator } from "./components/ChaosIndicator";
