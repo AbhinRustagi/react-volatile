@@ -1,0 +1,105 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Getting Started">
+  <h1>react-volatile</h1>
+  <p class="subtitle">Chaos engineering for React applications.</p>
+
+  <p>
+    Inject controlled failures into hooks, components, and async operations
+    during development and testing. Find out how your app behaves when things
+    go wrong — before your users do.
+  </p>
+
+  <h2>Install</h2>
+
+  <pre><code>npm install @react-volatile/react</code></pre>
+
+  <p>Or with pnpm:</p>
+
+  <pre><code>pnpm add @react-volatile/react</code></pre>
+
+  <h2>Quick Start</h2>
+
+  <p>
+    Wrap your app with <code>VolatileProvider</code> and swap React hooks for
+    their volatile equivalents:
+  </p>
+
+  <pre><code>{`import { VolatileProvider, useVolatileState, ChaosPanel } from '@react-volatile/react';
+
+function App() {
+  return (
+    <VolatileProvider config={{ chaos: { defaultProbability: 0.3 } }}>
+      <Counter />
+      <ChaosPanel />
+    </VolatileProvider>
+  );
+}
+
+function Counter() {
+  const [count, setCount] = useVolatileState(0, {
+    name: 'count',
+    component: 'Counter',
+    failures: ['delay', 'error', 'corrupt'],
+  });
+
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
+}`}</code></pre>
+
+  <p>
+    When chaos triggers, state updates may be delayed, throw errors, or
+    corrupt values. The <code>ChaosPanel</code> shows a live feed of chaos
+    events — toggle it with <code>Ctrl+Shift+V</code>.
+  </p>
+
+  <h2>How It Works</h2>
+
+  <p>
+    Each volatile hook wraps a standard React hook. On every call, the
+    <code>ChaosEngine</code> rolls against a probability to decide whether to
+    inject a failure. If it fires, it picks a random failure mode from the
+    allowed set and applies it.
+  </p>
+
+  <ul>
+    <li>
+      <strong>Seeded RNG</strong> — pass a <code>seed</code> in config for
+      reproducible chaos sequences across runs.
+    </li>
+    <li>
+      <strong>Targeting</strong> — include or exclude specific components,
+      hooks, or file patterns.
+    </li>
+    <li>
+      <strong>Production-safe</strong> — the provider auto-disables when
+      <code>NODE_ENV=production</code>.
+    </li>
+  </ul>
+
+  <h2>Packages</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Package</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>@react-volatile/core</code></td>
+        <td>Framework-agnostic chaos engine</td>
+      </tr>
+      <tr>
+        <td><code>@react-volatile/react</code></td>
+        <td>React hooks, provider, and devtools</td>
+      </tr>
+      <tr>
+        <td><code>@react-volatile/babel-plugin</code></td>
+        <td>Automatic hook transformation</td>
+      </tr>
+    </tbody>
+  </table>
+</Layout>

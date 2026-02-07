@@ -1,0 +1,126 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Babel Plugin">
+  <h1>Babel Plugin</h1>
+  <p class="subtitle">Automatic hook transformation at build time.</p>
+
+  <p>
+    Instead of manually replacing every <code>useState</code> with
+    <code>useVolatileState</code>, let the babel plugin do it for you.
+  </p>
+
+  <h2>Install</h2>
+
+  <pre><code>npm install -D @react-volatile/babel-plugin</code></pre>
+
+  <h2>Configure</h2>
+
+  <p>Add to your Babel config:</p>
+
+  <pre><code>{`{
+  "plugins": ["@react-volatile/babel-plugin"]
+}`}</code></pre>
+
+  <p>Or with options:</p>
+
+  <pre><code>{`{
+  "plugins": [
+    ["@react-volatile/babel-plugin", {
+      "mode": "all",
+      "include": ["src/components/"],
+      "exclude": ["src/components/Auth"]
+    }]
+  ]
+}`}</code></pre>
+
+  <h2>Options</h2>
+
+  <table>
+    <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>mode</code></td>
+        <td><code>"all" | "marked"</code></td>
+        <td><code>"all"</code></td>
+        <td>Transform all hooks or only those with a <code>@volatile</code> comment</td>
+      </tr>
+      <tr>
+        <td><code>include</code></td>
+        <td><code>string[]</code></td>
+        <td><code>[]</code></td>
+        <td>Only transform files matching these patterns</td>
+      </tr>
+      <tr>
+        <td><code>exclude</code></td>
+        <td><code>string[]</code></td>
+        <td><code>[]</code></td>
+        <td>Skip files matching these patterns</td>
+      </tr>
+      <tr>
+        <td><code>importSource</code></td>
+        <td><code>string</code></td>
+        <td><code>"@react-volatile/react"</code></td>
+        <td>Custom import path for volatile hooks</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>What Gets Transformed</h2>
+
+  <table>
+    <thead><tr><th>React Hook</th><th>Volatile Hook</th></tr></thead>
+    <tbody>
+      <tr><td><code>useState</code></td><td><code>useVolatileState</code></td></tr>
+      <tr><td><code>useEffect</code></td><td><code>useVolatileEffect</code></td></tr>
+      <tr><td><code>useLayoutEffect</code></td><td><code>useVolatileLayoutEffect</code></td></tr>
+      <tr><td><code>useReducer</code></td><td><code>useVolatileReducer</code></td></tr>
+      <tr><td><code>useMemo</code></td><td><code>useVolatileMemo</code></td></tr>
+      <tr><td><code>useCallback</code></td><td><code>useVolatileCallback</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Metadata Injection</h2>
+
+  <p>
+    The plugin automatically injects a metadata object into each transformed
+    hook call with the component name, hook name, and source location:
+  </p>
+
+  <pre><code>{`// Input
+import { useState } from 'react';
+function Counter() {
+  const [count, setCount] = useState(0);
+}
+
+// Output
+import { useVolatileState } from '@react-volatile/react';
+import { useState } from 'react';
+function Counter() {
+  const [count, setCount] = useVolatileState(0, {
+    component: 'Counter',
+    name: 'useState',
+    location: { line: 3, column: 30 },
+  });
+}`}</code></pre>
+
+  <h2>Marked Mode</h2>
+
+  <p>
+    In <code>"marked"</code> mode, only hooks preceded by a
+    <code>// @volatile</code> comment are transformed:
+  </p>
+
+  <pre><code>{`function App() {
+  // @volatile
+  const [count, setCount] = useState(0);  // transformed
+
+  const [name, setName] = useState('');   // left alone
+}`}</code></pre>
+
+  <p>
+    This is useful for gradually introducing chaos into specific hooks without
+    affecting the entire codebase.
+  </p>
+</Layout>

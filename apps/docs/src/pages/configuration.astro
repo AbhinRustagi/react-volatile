@@ -1,0 +1,175 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Configuration">
+  <h1>Configuration</h1>
+  <p class="subtitle">Control what breaks, when, and how often.</p>
+
+  <h2>VolatileProvider</h2>
+
+  <p>All configuration is passed through the provider:</p>
+
+  <pre><code>{`<VolatileProvider
+  config={{ chaos: { defaultProbability: 0.3, seed: 42 } }}
+  disabled={false}
+>
+  {children}
+</VolatileProvider>`}</code></pre>
+
+  <table>
+    <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>config</code></td><td><code>DeepPartial&lt;ChaosConfig&gt;</code></td><td>Engine configuration (all fields optional)</td></tr>
+      <tr><td><code>disabled</code></td><td><code>boolean</code></td><td>Force disable. Defaults to <code>true</code> in production.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>ChaosConfig Shape</h2>
+
+  <pre><code>{`{
+  enabled: boolean,          // master switch (default: true)
+
+  chaos: {
+    defaultProbability: number,  // 0–1 (default: 0.3)
+    delayRange: [number, number], // ms (default: [100, 3000])
+    seed: number,                // for reproducible sequences
+  },
+
+  microscopic: {
+    state:   { enabled, probability?, failures? },
+    effect:  { enabled, probability?, failures? },
+    context: { enabled, probability?, failures? },
+    async:   { enabled, probability?, failures? },
+  },
+
+  macroscopic: {
+    render:  { enabled, probability?, failures? },
+    mount:   { enabled, probability?, failures? },
+    unmount: { enabled, probability?, failures? },
+    lazy:    { enabled, probability?, failures? },
+  },
+
+  targeting: {
+    include: TargetPattern[],
+    exclude: TargetPattern[],
+  },
+
+  scheduling: {
+    pattern: 'continuous' | 'burst' | 'scheduled',
+    burstInterval?: number,      // ms between burst toggles
+    schedule?: { start, end }[], // time windows in ms
+  },
+
+  logging: {
+    enabled: boolean,
+    level: 'error' | 'warn' | 'info' | 'debug',
+    transport?: { send(event: ChaosEvent): void },
+  },
+
+  devtools: {
+    enabled: boolean,
+    showIndicator: boolean,
+    hotkey: string,
+  },
+}`}</code></pre>
+
+  <h2>Targeting</h2>
+
+  <p>
+    Control which components and hooks are affected. Include patterns act as
+    an allowlist. Exclude patterns always take priority.
+  </p>
+
+  <pre><code>{`<VolatileProvider config={{
+  targeting: {
+    include: [
+      { type: 'component', pattern: 'Dashboard' },
+      { type: 'hook', pattern: /^fetch/ },
+    ],
+    exclude: [
+      { type: 'component', pattern: 'AuthForm' },
+    ],
+  },
+}}>
+  {children}
+</VolatileProvider>`}</code></pre>
+
+  <table>
+    <thead><tr><th>Pattern Type</th><th>Matches Against</th></tr></thead>
+    <tbody>
+      <tr><td><code>component</code></td><td>Component name string</td></tr>
+      <tr><td><code>hook</code></td><td>Hook name / target string</td></tr>
+      <tr><td><code>file</code></td><td>File path (useful with babel plugin)</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    Patterns can be a plain string (uses <code>includes</code> matching) or a
+    <code>RegExp</code>.
+  </p>
+
+  <h2>Scheduling</h2>
+
+  <h3>Continuous</h3>
+  <p>Default. Chaos can trigger on every hook call.</p>
+
+  <h3>Burst</h3>
+  <p>
+    Alternates between active and inactive periods. Controlled by
+    <code>burstInterval</code> (default 5000ms).
+  </p>
+
+  <pre><code>{`scheduling: { pattern: 'burst', burstInterval: 3000 }`}</code></pre>
+
+  <h3>Scheduled</h3>
+  <p>
+    Only active during specific time windows (ms elapsed since engine start).
+  </p>
+
+  <pre><code>{`scheduling: {
+  pattern: 'scheduled',
+  schedule: [
+    { start: 0, end: 5000 },      // first 5 seconds
+    { start: 10000, end: 15000 },  // 10s–15s mark
+  ],
+}`}</code></pre>
+
+  <h2>Seeded Randomness</h2>
+
+  <p>
+    Pass a <code>seed</code> to make chaos sequences deterministic. The same
+    seed produces the same sequence of triggers and failure selections.
+  </p>
+
+  <pre><code>{`chaos: { seed: 42 }`}</code></pre>
+
+  <p>
+    The current seed is displayed in the <code>ChaosPanel</code> header for
+    easy reproduction.
+  </p>
+
+  <h2>Devtools</h2>
+
+  <h3>ChaosPanel</h3>
+  <p>
+    Floating panel that shows a live event feed. Toggle with
+    <code>Ctrl+Shift+V</code> (configurable via <code>devtools.hotkey</code>).
+    Supports filtering by chaos type and clearing history.
+  </p>
+
+  <pre><code>{`import { ChaosPanel } from '@react-volatile/react';
+// place inside VolatileProvider
+<ChaosPanel />`}</code></pre>
+
+  <h3>ChaosIndicator</h3>
+  <p>
+    Small badge that shows event count and pulses on chaos. Accepts a
+    <code>position</code> prop: <code>top-left</code>,
+    <code>top-right</code>, <code>bottom-left</code>,
+    <code>bottom-right</code>.
+  </p>
+
+  <pre><code>{`import { ChaosIndicator } from '@react-volatile/react';
+<ChaosIndicator position="bottom-left" />`}</code></pre>
+</Layout>

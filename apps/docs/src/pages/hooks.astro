@@ -1,0 +1,170 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Hooks">
+  <h1>Hooks</h1>
+  <p class="subtitle">Drop-in replacements for React hooks with chaos injection.</p>
+
+  <p>
+    Every hook accepts an optional options object as its last argument. All
+    options extend <code>HookMetadata</code>:
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>name</code></td><td><code>string</code></td><td>Identifier for targeting and logging</td></tr>
+      <tr><td><code>component</code></td><td><code>string</code></td><td>Enclosing component name</td></tr>
+      <tr><td><code>probability</code></td><td><code>number</code></td><td>Override the default probability (0–1)</td></tr>
+      <tr><td><code>failures</code></td><td><code>string[]</code></td><td>Allowed failure modes for this hook</td></tr>
+    </tbody>
+  </table>
+
+  <!-- useVolatileState -->
+  <h2>useVolatileState</h2>
+
+  <pre><code>{`const [state, setState] = useVolatileState(initialState, options?)`}</code></pre>
+
+  <p>Wraps <code>useState</code>. Chaos is injected when the setter is called.</p>
+
+  <table>
+    <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>delay</code></td><td>State update is applied after a random delay</td></tr>
+      <tr><td><code>error</code></td><td>Throws a <code>VolatileError</code></td></tr>
+      <tr><td><code>corrupt</code></td><td>Applies a corrupted value instead of the real one</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Custom Corruptor</h3>
+
+  <pre><code>{`const [name, setName] = useVolatileState('hello', {
+  failures: ['corrupt'],
+  corruptor: (value) => value.toUpperCase() + '!!',
+});`}</code></pre>
+
+  <!-- useVolatileEffect -->
+  <h2>useVolatileEffect</h2>
+
+  <pre><code>{`useVolatileEffect(effect, deps, options?)`}</code></pre>
+
+  <p>Wraps <code>useEffect</code>. Chaos is injected when the effect runs.</p>
+
+  <table>
+    <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>delay</code></td><td>Effect execution is delayed</td></tr>
+      <tr><td><code>error</code></td><td>Throws a <code>VolatileError</code></td></tr>
+      <tr><td><code>skip</code></td><td>Effect is skipped entirely</td></tr>
+    </tbody>
+  </table>
+
+  <pre><code>{`useVolatileEffect(() => {
+  fetchData();
+  return () => cleanup();
+}, [id], {
+  name: 'fetchData',
+  component: 'UserProfile',
+  failures: ['delay', 'skip'],
+});`}</code></pre>
+
+  <p>
+    <code>useVolatileLayoutEffect</code> works identically but wraps
+    <code>useLayoutEffect</code>.
+  </p>
+
+  <!-- useVolatileReducer -->
+  <h2>useVolatileReducer</h2>
+
+  <pre><code>{`const [state, dispatch] = useVolatileReducer(reducer, initialState, options?)`}</code></pre>
+
+  <p>
+    Wraps <code>useReducer</code>. Chaos is injected when <code>dispatch</code>
+    is called.
+  </p>
+
+  <table>
+    <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>delay</code></td><td>Dispatch is applied after a random delay</td></tr>
+      <tr><td><code>error</code></td><td>Throws a <code>VolatileError</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- useVolatileMemo -->
+  <h2>useVolatileMemo</h2>
+
+  <pre><code>{`const value = useVolatileMemo(factory, deps, options?)`}</code></pre>
+
+  <p>Wraps <code>useMemo</code>. Chaos is injected during memoization.</p>
+
+  <table>
+    <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>error</code></td><td>Throws a <code>VolatileError</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- useVolatileCallback -->
+  <h2>useVolatileCallback</h2>
+
+  <pre><code>{`const fn = useVolatileCallback(callback, deps, options?)`}</code></pre>
+
+  <p>Wraps <code>useCallback</code>. Chaos is injected when the returned function is called.</p>
+
+  <table>
+    <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>error</code></td><td>Throws a <code>VolatileError</code></td></tr>
+      <tr><td><code>delay</code></td><td>Callback returns a Promise that resolves after a delay</td></tr>
+      <tr><td><code>noop</code></td><td>Callback does nothing, returns <code>undefined</code></td></tr>
+    </tbody>
+  </table>
+
+  <!-- useVolatileAsync -->
+  <h2>useVolatileAsync</h2>
+
+  <pre><code>{`const { data, error, loading, execute } = useVolatileAsync(asyncFn, options?)`}</code></pre>
+
+  <p>
+    Wraps an async function with loading/error state management and chaos
+    injection.
+  </p>
+
+  <table>
+    <thead><tr><th>Failure</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>delay</code></td><td>Adds a random delay before executing</td></tr>
+      <tr><td><code>reject</code></td><td>Rejects with a <code>VolatileError</code></td></tr>
+      <tr><td><code>timeout</code></td><td>Waits 3x the delay range then rejects</td></tr>
+    </tbody>
+  </table>
+
+  <pre><code>{`const { data, error, loading, execute } = useVolatileAsync(
+  () => fetch('/api/users').then(r => r.json()),
+  { name: 'fetchUsers', failures: ['delay', 'reject'] },
+);
+
+// call execute() to run the async function
+<button onClick={() => execute()}>Load</button>`}</code></pre>
+
+  <!-- useChaosTrigger -->
+  <h2>useChaosTrigger</h2>
+
+  <pre><code>{`const { trigger, isActive, engine } = useChaosTrigger()`}</code></pre>
+
+  <p>
+    Manual control hook. Does not wrap any React hook — use it to emit chaos
+    events programmatically.
+  </p>
+
+  <pre><code>{`trigger({
+  type: 'state',
+  failure: 'error',
+  target: 'manualTest',
+  component: 'DebugPanel',
+});`}</code></pre>
+</Layout>

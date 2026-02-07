@@ -1,0 +1,269 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const currentPath = Astro.url.pathname;
+
+const nav = [
+  { href: `${base}/`, label: "Getting Started" },
+  { href: `${base}/hooks/`, label: "Hooks" },
+  { href: `${base}/configuration/`, label: "Configuration" },
+  { href: `${base}/babel-plugin/`, label: "Babel Plugin" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} - react-volatile</title>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <a href={`${base}/`} class="logo">react-volatile</a>
+        <nav>
+          {nav.map(({ href, label }) => (
+            <a
+              href={href}
+              class:list={["nav-link", { active: currentPath === href }]}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+        <div class="sidebar-footer">
+          <a
+            href="https://github.com/AbhinRustagi/react-volatile"
+            class="nav-link"
+            target="_blank"
+          >
+            GitHub
+          </a>
+        </div>
+      </aside>
+      <main>
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg: #0f0f17;
+    --bg-surface: #161620;
+    --bg-code: #1c1c2e;
+    --text: #e0e0e8;
+    --text-muted: #8888a0;
+    --accent: #7c3aed;
+    --accent-dim: #6d28d9;
+    --border: #2a2a3c;
+    --sidebar-w: 220px;
+  }
+
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    padding: 24px 16px;
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 32px;
+    display: block;
+  }
+  .logo:hover {
+    text-decoration: none;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--bg-surface);
+    text-decoration: none;
+  }
+  .nav-link.active {
+    color: var(--text);
+    background: var(--bg-surface);
+    border-left: 2px solid var(--accent);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  main {
+    margin-left: var(--sidebar-w);
+    padding: 48px 56px;
+    max-width: 780px;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-size: 16px;
+  }
+
+  code {
+    font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--bg-code);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 12px 0 20px;
+    line-height: 1.5;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 13px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 14px;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  ul, ol {
+    margin: 8px 0 16px 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: #fff;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      position: static;
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .shell {
+      flex-direction: column;
+    }
+    main {
+      margin-left: 0;
+      padding: 24px 20px;
+    }
+  }
+</style>
