@@ -1,6 +1,11 @@
 {
   "name": "react-volatile",
   "private": true,
+  "author": {
+    "email": "hi@abhin.dev",
+    "name": "Abhin Rustagi",
+    "url": "https://www.abhin.dev"
+  },
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
