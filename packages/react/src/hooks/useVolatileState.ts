@@ -15,9 +15,15 @@ export function useVolatileState<T>(
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   const engine = useVolatileEngine();
   const [state, setState] = useState(initialState);
+  const [pendingError, setPendingError] = useState<VolatileError | null>(null);
   const delayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const target = options.name ?? "useState";
   const component = options.component;
+
+  // Throw during render so ErrorBoundary can catch it
+  if (pendingError) {
+    throw pendingError;
+  }
 
   useEffect(() => {
     return () => {
@@ -46,7 +52,8 @@ export function useVolatileState<T>(
           break;
         }
         case "error":
-          throw new VolatileError("state", "error", target, component);
+          setPendingError(new VolatileError("state", "error", target, component));
+          break;
         case "corrupt": {
           const resolvedValue =
             typeof action === "function"

@@ -1,3 +1,4 @@
+import React, { Component, type ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, act, screen } from "@testing-library/react";
 import { VolatileProvider } from "../provider/VolatileProvider";
@@ -31,6 +32,23 @@ function renderWithProvider(ui: React.ReactElement, seed = 42) {
       {ui}
     </VolatileProvider>,
   );
+}
+
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: boolean }
+> {
+  state = { error: false };
+  static getDerivedStateFromError() {
+    return { error: true };
+  }
+  render() {
+    return this.state.error ? (
+      <span data-testid="error">caught</span>
+    ) : (
+      this.props.children
+    );
+  }
 }
 
 describe("useVolatileState", () => {
@@ -90,23 +108,6 @@ describe("useVolatileState", () => {
         failures: ["error"],
       });
       return <button onClick={() => setCount(count + 1)}>{count}</button>;
-    }
-
-    class ErrorBoundary extends React.Component<
-      { children: React.ReactNode },
-      { error: boolean }
-    > {
-      state = { error: false };
-      static getDerivedStateFromError() {
-        return { error: true };
-      }
-      render() {
-        return this.state.error ? (
-          <span data-testid="error">caught</span>
-        ) : (
-          this.props.children
-        );
-      }
     }
 
     renderWithProvider(
