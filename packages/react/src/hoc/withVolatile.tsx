@@ -18,7 +18,7 @@ export function withVolatile<P extends Record<string, unknown>>(
   function VolatileWrapper(props: P) {
     const engine = useVolatileEngine();
     const [ready, setReady] = useState(true);
-    const delayTimerRef = useRef<ReturnType<typeof setTimeout>>();
+    const delayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
       return () => {

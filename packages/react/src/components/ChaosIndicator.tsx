@@ -16,7 +16,7 @@ export function ChaosIndicator({ position = "bottom-left" }: ChaosIndicatorProps
   const engine = useVolatileEngine();
   const [count, setCount] = useState(0);
   const [pulse, setPulse] = useState(false);
-  const pulseTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const pulseTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!engine) return;

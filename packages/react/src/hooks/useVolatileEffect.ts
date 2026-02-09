@@ -17,7 +17,7 @@ function createVolatileEffectHook(useEffectHook: typeof useEffect) {
     options: UseVolatileEffectOptions = {},
   ): void {
     const engine = useVolatileEngine();
-    const delayTimerRef = useRef<ReturnType<typeof setTimeout>>();
+    const delayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const cleanupRef = useRef<(() => void) | void>();
 
     useEffectHook(() => {

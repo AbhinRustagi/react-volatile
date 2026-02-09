@@ -16,7 +16,7 @@ export function useVolatileReducer<S, A>(
   const engine = useVolatileEngine();
   const [state, dispatch] = useReducer(reducer, initialState);
   const stateRef = useRef(state);
-  const delayTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const delayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const target = options.name ?? "useReducer";
 
   stateRef.current = state;

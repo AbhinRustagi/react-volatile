@@ -15,7 +15,7 @@ export function useVolatileState<T>(
 ): [T, React.Dispatch<React.SetStateAction<T>>] {
   const engine = useVolatileEngine();
   const [state, setState] = useState(initialState);
-  const delayTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const delayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const target = options.name ?? "useState";
   const component = options.component;
 
