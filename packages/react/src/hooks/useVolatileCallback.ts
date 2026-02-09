@@ -3,11 +3,9 @@ import { VolatileError } from "@react-volatile/core";
 import type { HookMetadata } from "@react-volatile/core";
 import { useVolatileEngine } from "../provider/VolatileContext";
 
-type CallbackFailure = "error" | "delay" | "noop";
-
 interface UseVolatileCallbackOptions extends HookMetadata {
   probability?: number;
-  failures?: CallbackFailure[];
+  failures?: ("error" | "delay")[];
 }
 
 export function useVolatileCallback<T extends (...args: unknown[]) => unknown>(
@@ -37,7 +35,7 @@ export function useVolatileCallback<T extends (...args: unknown[]) => unknown>(
 
       const failure = engine.selectFailure(
         "state",
-        options.failures ?? ["error", "delay", "noop"],
+        options.failures ?? ["error", "delay"],
       );
 
       engine.emitEvent({
@@ -60,8 +58,6 @@ export function useVolatileCallback<T extends (...args: unknown[]) => unknown>(
             pendingTimers.current.add(timer);
           });
         }
-        case "noop":
-          return undefined;
         default:
           return callback(...args);
       }

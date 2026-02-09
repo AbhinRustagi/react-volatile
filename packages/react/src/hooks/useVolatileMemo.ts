@@ -3,11 +3,9 @@ import { VolatileError } from "@react-volatile/core";
 import type { HookMetadata } from "@react-volatile/core";
 import { useVolatileEngine } from "../provider/VolatileContext";
 
-type MemoFailure = "error" | "recompute";
-
 interface UseVolatileMemoOptions extends HookMetadata {
   probability?: number;
-  failures?: MemoFailure[];
+  failures?: ("error")[];
 }
 
 export function useVolatileMemo<T>(
@@ -23,7 +21,7 @@ export function useVolatileMemo<T>(
       return factory();
     }
 
-    const failure = engine.selectFailure("state", options.failures ?? ["error"]);
+    const failure = engine.selectFailure("state", options.failures);
 
     engine.emitEvent({
       type: "state",
