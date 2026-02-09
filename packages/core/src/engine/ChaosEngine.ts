@@ -49,14 +49,12 @@ const DEFAULT_CONFIG: ChaosConfig = {
   },
 };
 
-function deepMerge<T extends Record<string, unknown>>(
-  target: T,
-  source: DeepPartial<T>,
-): T {
-  const result = { ...target };
-  for (const key in source) {
-    const sourceVal = source[key];
-    const targetVal = target[key];
+function deepMerge<T>(target: T, source: DeepPartial<T>): T {
+  const result = { ...target } as Record<string, unknown>;
+  const src = source as Record<string, unknown>;
+  for (const key in src) {
+    const sourceVal = src[key];
+    const targetVal = result[key];
     if (
       sourceVal &&
       typeof sourceVal === "object" &&
@@ -66,12 +64,12 @@ function deepMerge<T extends Record<string, unknown>>(
       result[key] = deepMerge(
         (targetVal as Record<string, unknown>) ?? {},
         sourceVal as DeepPartial<Record<string, unknown>>,
-      ) as T[Extract<keyof T, string>];
+      );
     } else if (sourceVal !== undefined) {
-      result[key] = sourceVal as T[Extract<keyof T, string>];
+      result[key] = sourceVal;
     }
   }
-  return result;
+  return result as T;
 }
 
 let eventCounter = 0;
