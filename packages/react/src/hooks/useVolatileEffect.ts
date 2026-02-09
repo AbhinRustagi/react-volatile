@@ -18,7 +18,7 @@ function createVolatileEffectHook(useEffectHook: typeof useEffect) {
   ): void {
     const engine = useVolatileEngine();
     const delayTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-    const cleanupRef = useRef<(() => void) | void>();
+    const cleanupRef = useRef<(() => void) | void>(undefined);
 
     useEffectHook(() => {
       if (!engine || !engine.shouldTrigger("effect", options.name ?? "useEffect", options.probability)) {

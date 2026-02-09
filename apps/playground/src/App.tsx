@@ -1,4 +1,8 @@
-import { VolatileProvider, ChaosPanel, ChaosIndicator } from "@react-volatile/react";
+import {
+  VolatileProvider,
+  ChaosPanel,
+  ChaosIndicator,
+} from "@react-volatile/react";
 import { Counter } from "./examples/Counter";
 import { AsyncExample } from "./examples/AsyncExample";
 import { EffectExample } from "./examples/EffectExample";

@@ -1,11 +1,16 @@
-import type { PluginObj, NodePath } from "@babel/core";
-import type * as t from "@babel/types";
+import type { PluginObj, PluginPass, NodePath } from "@babel/core";
+import type * as BabelTypes from "@babel/types";
 
 interface PluginOptions {
   mode?: "all" | "marked";
   include?: string[];
   exclude?: string[];
   importSource?: string;
+}
+
+interface PluginState extends PluginPass {
+  _skip?: boolean;
+  _usedVolatileHooks?: Set<string>;
 }
 
 const HOOK_MAP: Record<string, string> = {
@@ -30,18 +35,18 @@ const METADATA_POSITION: Record<string, "last" | "second"> = {
 export default function reactVolatilePlugin({
   types: t,
 }: {
-  types: typeof import("@babel/types");
-}): PluginObj {
+  types: typeof BabelTypes;
+}): PluginObj<PluginState> {
   return {
     name: "react-volatile",
     visitor: {
       Program: {
-        enter(path, state) {
+        enter(_path, state) {
           const opts = state.opts as PluginOptions;
           const filename = state.filename ?? "";
 
           if (opts.exclude?.some((p) => filename.includes(p))) {
-            (state as Record<string, unknown>).__skip = true;
+            state._skip = true;
             return;
           }
           if (
@@ -49,16 +54,15 @@ export default function reactVolatilePlugin({
             opts.include.length > 0 &&
             !opts.include.some((p) => filename.includes(p))
           ) {
-            (state as Record<string, unknown>).__skip = true;
+            state._skip = true;
             return;
           }
 
-          (state as Record<string, unknown>).__volatileImported = false;
-          (state as Record<string, unknown>).__usedVolatileHooks = new Set<string>();
+          state._usedVolatileHooks = new Set<string>();
         },
         exit(path, state) {
-          if ((state as Record<string, unknown>).__skip) return;
-          const used = (state as Record<string, unknown>).__usedVolatileHooks as Set<string>;
+          if (state._skip) return;
+          const used = state._usedVolatileHooks;
           if (!used || used.size === 0) return;
 
           const opts = state.opts as PluginOptions;
@@ -78,7 +82,7 @@ export default function reactVolatilePlugin({
       },
 
       CallExpression(path, state) {
-        if ((state as Record<string, unknown>).__skip) return;
+        if (state._skip) return;
 
         const opts = state.opts as PluginOptions;
         const callee = path.node.callee;
@@ -140,14 +144,13 @@ export default function reactVolatilePlugin({
         }
 
         callee.name = volatileHook;
-        const used = (state as Record<string, unknown>).__usedVolatileHooks as Set<string>;
-        used.add(volatileHook);
+        state._usedVolatileHooks?.add(volatileHook);
       },
     },
   };
 }
 
-function hasVolatileComment(path: NodePath<t.CallExpression>): boolean {
+function hasVolatileComment(path: NodePath<BabelTypes.CallExpression>): boolean {
   const statement = path.getStatementParent();
   if (!statement) return false;
   const comments = statement.node.leadingComments;
@@ -155,10 +158,10 @@ function hasVolatileComment(path: NodePath<t.CallExpression>): boolean {
 }
 
 function getEnclosingComponentName(
-  path: NodePath,
-  t: typeof import("@babel/types"),
+  path: NodePath<BabelTypes.Node>,
+  t: typeof BabelTypes,
 ): string | null {
-  let current: NodePath | null = path;
+  let current: NodePath<BabelTypes.Node> | null = path;
   while (current) {
     if (t.isFunctionDeclaration(current.node) && current.node.id) {
       return current.node.id.name;
