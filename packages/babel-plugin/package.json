@@ -26,6 +26,7 @@
     "@babel/core": "^7.26.0"
   },
   "devDependencies": {
+    "@types/babel__core": "^7.20.5",
     "@babel/types": "^7.26.0",
     "tsup": "^8.3.5",
     "vitest": "^2.1.8"
