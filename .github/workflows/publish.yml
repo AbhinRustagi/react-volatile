@@ -10,8 +10,10 @@ permissions:
   id-token: write
 
 jobs:
-  publish:
+  publish-packages:
     runs-on: ubuntu-latest
+    environment:
+      - name: npm-publish
     steps:
       - uses: actions/checkout@v4
 

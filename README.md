@@ -10,6 +10,26 @@ Chaos engineering for React applications. Inject controlled failures into hooks,
 | `@react-volatile/react` | React hooks, provider, and devtools |
 | `@react-volatile/babel-plugin` | Automatic hook transformation |
 
+## Installation
+
+```bash
+npm install @react-volatile/react
+```
+
+```bash
+yarn add @react-volatile/react
+```
+
+```bash
+pnpm add @react-volatile/react
+```
+
+The `@react-volatile/core` package is included as a dependency. For the babel plugin:
+
+```bash
+npm install -D @react-volatile/babel-plugin
+```
+
 ## Quick Start
 
 ```tsx
