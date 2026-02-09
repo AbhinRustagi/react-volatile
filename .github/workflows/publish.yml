@@ -12,8 +12,7 @@ permissions:
 jobs:
   publish-packages:
     runs-on: ubuntu-latest
-    environment:
-      - name: npm-publish
+    environment: "npm-publish"
     steps:
       - uses: actions/checkout@v4
 
